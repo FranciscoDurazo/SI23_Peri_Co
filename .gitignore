@@ -9,6 +9,7 @@ __pycache__/
 # Distribution / packaging
 .Python
 ejercicio_7-cnns/data
+proyecto_2_DL/data
 build/
 develop-eggs/
 dist/
