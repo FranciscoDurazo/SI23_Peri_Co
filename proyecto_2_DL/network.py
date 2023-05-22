@@ -53,7 +53,7 @@ class Network(nn.Module):
         '''
         models_path = file_path / 'models' / model_name
         # TODO: Guarda los pesos de tu red neuronal en el path especificado
-        torch.save( ... )
+        torch.save(self.state_dict(), models_path)
 
     def load_model(self, model_name: str):
         '''
@@ -62,3 +62,5 @@ class Network(nn.Module):
             - path (str): path relativo donde se guardó el modelo
         '''
         # TODO: Carga los pesos de tu red neuronal
+        models_path = file_path / 'models' / model_name
+        self.load_state_dict(torch.load(models_path))
