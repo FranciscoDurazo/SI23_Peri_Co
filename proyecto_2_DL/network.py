@@ -12,7 +12,7 @@ class Network(nn.Module):
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
         # TODO: Calcular dimension de salida
-        out_dim = self.calc_out_dim(input_dim)
+        out_dim = self.calc_out_dim(input_dim,3)
 
         # TODO: Define las capas de tu red
         self.conv1 = nn.Conv2d(1,6,3)
