@@ -39,7 +39,7 @@ def validation_step(val_loader, net, cost_function):
             loss = cost_function(predictions,batch_labels)
             val_loss += loss
     # TODO: Regresa el costo promedio por minibatch
-    return val_loss
+    return val_loss/i
 
 def train():
     # Hyperparametros
@@ -89,17 +89,18 @@ def train():
             # TODO acumula el costo
             running_loss += loss.item()
             if i % 1000 == 999:    # print every 2000 mini-batches
-                print(f'[{epoch + 1}, {i + 1:5d}] loss: {running_loss / 2000:.3f}')
+                print(f'[{epoch + 1}, {i + 1:5d}] loss: {running_loss / 1000:.3f}')
                 train_loss += running_loss
                 running_loss = 0.0
-
+        print(i)
         # TODO Calcula el costo promedio
-        train_loss = ...
+        train_loss = train_loss/i
         val_loss = validation_step(val_loader, modelo, criterion)
         tqdm.write(f"Epoch: {epoch}, train_loss: {train_loss:.2f}, val_loss: {val_loss:.2f}")
 
         # TODO guarda el modelo si el costo de validación es menor al mejor costo de validación
-        ...
+        if val_loss<best_epoch_loss:
+            modelo.save_model()
         plotter.on_epoch_end(epoch, train_loss, val_loss)
     plotter.on_train_end()
 
