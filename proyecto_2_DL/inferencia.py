@@ -26,7 +26,7 @@ def predict(img_title_paths):
     '''
     # Cargar el modelo
     modelo = Network(48, 7)
-    modelo.load_model("modelo_1.pt")
+    modelo.load_model("prueba1.pth")
     for path in img_title_paths:
         # Cargar la imagen
         # np.ndarray, torch.Tensor

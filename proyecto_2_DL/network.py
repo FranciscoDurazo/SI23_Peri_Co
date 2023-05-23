@@ -18,7 +18,7 @@ class Network(nn.Module):
         self.conv1 = nn.Conv2d(1,6,3)
         self.pool = nn.MaxPool2d(2,2)
         self.conv2 = nn.Conv2d(6,16,3)
-        self.fc1 =nn.Linear(16*6*6, n_classes)
+        self.fc1 =nn.Linear(1600, n_classes)
         self.fc2 =nn.Softmax(dim=1)
         self.to(self.device)
  
@@ -35,9 +35,9 @@ class Network(nn.Module):
         x = F.relu(x)
         x = self.pool(x)
         #Flatten
-        x = x.view(-1,16*6*6)
+        x = x.view(-1,1600)
         logits = self.fc1(x)
-        proba = self.fc1(logits)       
+        proba = self.fc2(logits)       
         return logits, proba
 
     def predict(self, x):

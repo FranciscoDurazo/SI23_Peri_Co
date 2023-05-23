@@ -32,11 +32,17 @@ def validation_step(val_loader, net, cost_function):
         batch_labels = batch_labels.to(device)
         with torch.inference_mode():
             # TODO: realiza un forward pass, calcula el loss y acumula el costo
-            logits, probs = net(batch_imgs)
-            print(probs)
+            # logits, probs = net(batch_imgs)
+            probs = torch.empty(batch_labels.shape[0],7)
+            logits = torch.empty(batch_labels.shape[0],7)
+            for j in range(0,batch_labels.shape[0]):    
+                logits[j], probs[j] = net(batch_imgs[j])
+            # print(probs)
             predictions = torch.argmax(probs,dim=1)
-            print(predictions)
-            loss = cost_function(predictions,batch_labels)
+            # print(predictions)
+            num_classes = 7  # Number of classes
+            target = nn.functional.one_hot(batch_labels, num_classes=num_classes).float()
+            loss = cost_function(probs,target)
             val_loss += loss
     # TODO: Regresa el costo promedio por minibatch
     return val_loss/i
@@ -73,23 +79,37 @@ def train():
     best_epoch_loss = np.inf
     for epoch in range(n_epochs):
         train_loss = 0
+        running_loss = 0
         for i, batch in enumerate(tqdm(train_loader, desc=f"Epoch: {epoch}")):
             batch_imgs = batch['transformed']
+            # print(batch_imgs.shape)
             batch_labels = batch['label']
             # TODO Zero grad, forward pass, backward pass, optimizer step
             optimizer.zero_grad()
-            logits, probs = modelo(batch_imgs)
-            print(probs)
-            predictions = torch.argmax(probs,dim=1)
-            print(predictions)
-            loss = criterion(predictions,batch_labels)
+            probs = torch.empty(batch_labels.shape[0],7)
+            logits = torch.empty(batch_labels.shape[0],7)
+            for j in range(batch_labels.shape[0]):    
+                logits[j], probs[j] = modelo(batch_imgs[j])  
+            # print(probs)
+            # predictions = torch.argmax(probs,dim=1)
+            # predictions = probs
+            # print(predictions)
+            # print(type(predictions))
+            # print(type(batch_labels))
+            # print(batch_labels)
+            # target = torch.zeros((batch_labels.shape[0],7), dtype=torch.float)
+            # for j in range(batch_labels.shape[0]):    
+            #     target[j][batch_labels[j]] = 1.0
+            num_classes = 7  # Number of classes
+            target = nn.functional.one_hot(batch_labels, num_classes=num_classes).float()
+            loss = criterion(probs, target)
             loss.backward()
             optimizer.step()
 
             # TODO acumula el costo
             running_loss += loss.item()
-            if i % 1000 == 999:    # print every 2000 mini-batches
-                print(f'[{epoch + 1}, {i + 1:5d}] loss: {running_loss / 1000:.3f}')
+            if i % 20 == 19:    # print every 2000 mini-batches
+                print(f'[{epoch + 1}, {i + 1:5d}] loss: {running_loss / 20:.3f}')
                 train_loss += running_loss
                 running_loss = 0.0
         print(i)
@@ -100,7 +120,7 @@ def train():
 
         # TODO guarda el modelo si el costo de validación es menor al mejor costo de validación
         if val_loss<best_epoch_loss:
-            modelo.save_model()
+            modelo.save_model("prueba1.pth")
         plotter.on_epoch_end(epoch, train_loss, val_loss)
     plotter.on_train_end()
 
