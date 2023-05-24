@@ -32,17 +32,17 @@ def validation_step(val_loader, net, cost_function):
         batch_labels = batch_labels.to(device)
         with torch.inference_mode():
             # TODO: realiza un forward pass, calcula el loss y acumula el costo
-            # logits, probs = net(batch_imgs)
-            probs = torch.empty(batch_labels.shape[0],7)
-            logits = torch.empty(batch_labels.shape[0],7)
-            for j in range(0,batch_labels.shape[0]):    
-                logits[j], probs[j] = net(batch_imgs[j])
+            logits, probs = net(batch_imgs)
+            # probs = torch.empty(batch_labels.shape[0],7)
+            # logits = torch.empty(batch_labels.shape[0],7)
+            # for j in range(0,batch_labels.shape[0]):    
+            #     logits[j], probs[j] = net(batch_imgs[j])
             # print(probs)
             predictions = torch.argmax(probs,dim=1)
             # print(predictions)
-            num_classes = 7  # Number of classes
-            target = nn.functional.one_hot(batch_labels, num_classes=num_classes).float()
-            loss = cost_function(probs,target)
+            # num_classes = 7  # Number of classes
+            # target = nn.functional.one_hot(batch_labels, num_classes=num_classes).float()
+            loss = cost_function(logits, batch_labels)
             val_loss += loss
     # TODO: Regresa el costo promedio por minibatch
     return val_loss/i
@@ -86,10 +86,12 @@ def train():
             batch_labels = batch['label']
             # TODO Zero grad, forward pass, backward pass, optimizer step
             optimizer.zero_grad()
-            probs = torch.empty(batch_labels.shape[0],7)
-            logits = torch.empty(batch_labels.shape[0],7)
-            for j in range(batch_labels.shape[0]):    
-                logits[j], probs[j] = modelo(batch_imgs[j])  
+            # probs = torch.empty(batch_labels.shape[0],7)
+            # logits = torch.empty(batch_labels.shape[0],7)
+            # for j in range(batch_labels.shape[0]):    
+            #     logits[j], probs[j] = modelo(batch_imgs[j])  
+            logits, probs = modelo(batch_imgs)  
+
             # print(probs)
             # predictions = torch.argmax(probs,dim=1)
             # predictions = probs
@@ -100,9 +102,9 @@ def train():
             # target = torch.zeros((batch_labels.shape[0],7), dtype=torch.float)
             # for j in range(batch_labels.shape[0]):    
             #     target[j][batch_labels[j]] = 1.0
-            num_classes = 7  # Number of classes
-            target = nn.functional.one_hot(batch_labels, num_classes=num_classes).float()
-            loss = criterion(probs, target)
+            # num_classes = 7  # Number of classes
+            # target = nn.functional.one_hot(batch_labels, num_classes=num_classes).float()
+            loss = criterion(logits, batch_labels)
             loss.backward()
             optimizer.step()
 
