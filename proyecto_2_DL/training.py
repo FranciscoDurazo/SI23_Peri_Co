@@ -33,17 +33,8 @@ def validation_step(val_loader, net, cost_function):
         with torch.inference_mode():
             # TODO: realiza un forward pass, calcula el loss y acumula el costo
             logits, probs = net(batch_imgs)
-            # probs = torch.empty(batch_labels.shape[0],7)
-            # logits = torch.empty(batch_labels.shape[0],7)
-            # for j in range(0,batch_labels.shape[0]):    
-            #     logits[j], probs[j] = net(batch_imgs[j])
-            # print(probs)
-            predictions = torch.argmax(probs,dim=1)
-            # print(predictions)
-            # num_classes = 7  # Number of classes
-            # target = nn.functional.one_hot(batch_labels, num_classes=num_classes).float()
             loss = cost_function(logits, batch_labels)
-            val_loss += loss
+            val_loss += loss.item()
     # TODO: Regresa el costo promedio por minibatch
     return val_loss/i
 
@@ -86,34 +77,14 @@ def train():
             batch_labels = batch['label']
             # TODO Zero grad, forward pass, backward pass, optimizer step
             optimizer.zero_grad()
-            # probs = torch.empty(batch_labels.shape[0],7)
-            # logits = torch.empty(batch_labels.shape[0],7)
-            # for j in range(batch_labels.shape[0]):    
-            #     logits[j], probs[j] = modelo(batch_imgs[j])  
             logits, probs = modelo(batch_imgs)  
 
-            # print(probs)
-            # predictions = torch.argmax(probs,dim=1)
-            # predictions = probs
-            # print(predictions)
-            # print(type(predictions))
-            # print(type(batch_labels))
-            # print(batch_labels)
-            # target = torch.zeros((batch_labels.shape[0],7), dtype=torch.float)
-            # for j in range(batch_labels.shape[0]):    
-            #     target[j][batch_labels[j]] = 1.0
-            # num_classes = 7  # Number of classes
-            # target = nn.functional.one_hot(batch_labels, num_classes=num_classes).float()
             loss = criterion(logits, batch_labels)
             loss.backward()
             optimizer.step()
 
             # TODO acumula el costo
-            running_loss += loss.item()
-            if i % 20 == 19:    # print every 2000 mini-batches
-                print(f'[{epoch + 1}, {i + 1:5d}] loss: {running_loss / 20:.3f}')
-                train_loss += running_loss
-                running_loss = 0.0
+            train_loss += loss.item()
         print(i)
         # TODO Calcula el costo promedio
         train_loss = train_loss/i
@@ -122,7 +93,7 @@ def train():
 
         # TODO guarda el modelo si el costo de validación es menor al mejor costo de validación
         if val_loss<best_epoch_loss:
-            modelo.save_model("prueba1.pth")
+            modelo.save_model("prueba1.pt")
         plotter.on_epoch_end(epoch, train_loss, val_loss)
     plotter.on_train_end()
 

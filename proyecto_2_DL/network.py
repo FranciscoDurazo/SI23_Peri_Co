@@ -17,8 +17,8 @@ class Network(nn.Module):
         # TODO: Define las capas de tu red
         self.conv1 = nn.Conv2d(1,8,3)
         self.pool = nn.MaxPool2d(2,2)
-        self.conv2 = nn.Conv2d(8,4,3)
-        self.fc1 =nn.Linear(400, 64)
+        self.conv2 = nn.Conv2d(8,24,3)
+        self.fc1 =nn.Linear(2400, 64)
         self.fc2 =nn.Linear(64, n_classes)
         self.softmax =nn.Softmax(dim=1)
         self.to(self.device)
@@ -36,7 +36,7 @@ class Network(nn.Module):
         x = F.relu(x)
         x = self.pool(x)
         #Flatten
-        x = x.view(-1,400)
+        x = x.view(-1,2400)
         x = self.fc1(x)
         logits = self.fc2(x)
         proba = self.softmax(logits)       
